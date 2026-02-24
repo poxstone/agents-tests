@@ -4,12 +4,13 @@ from langchain_google_vertexai import ChatVertexAI
 from langchain_core.prompts import ChatPromptTemplate
 
 # 1. Configuración inicial
-AGENT_DEPLOY_NAME =  "Agent-test-01"
+AGENT_DEPLOY_NAME =  "agente-test-01"
 PROJECT_ID = "bluetab-colombia-data-qa"
 LOCATION = "us-central1" # O tu región preferida
 STAGING_BUCKET = "gs://bluetab-colombia-data-qa-staging-bucket" # Necesario para guardar el código
 GEMINI_VERSION = "gemini-2.0-flash-exp"
-
+VPC_NAME = "default"
+SERVICE_ACCOUNT = f"test-gemini@{PROJECT_ID}.iam.gserviceaccount.com"
 
 vertexai.init(project=PROJECT_ID, location=LOCATION, staging_bucket=STAGING_BUCKET)
 
@@ -28,7 +29,7 @@ class HolaMundoAgent:
         
         # El prompt ahora debe incluir un lugar para el historial
         self.prompt = ChatPromptTemplate.from_messages([
-            ("system", "Eres un asistente con memoria persistente."),
+            ("system", "Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento"),
             MessagesPlaceholder(variable_name="history"),
             ("user", "{input}")
         ])
@@ -55,22 +56,44 @@ class HolaMundoAgent:
         # Importante: Ahora el método recibe un session_id
         return self.with_history.invoke(
             {"input": input},
-            config={"configurable": {"session_id": session_id}}
+            config={
+                "configurable": {"session_id": session_id}
+                },
         ).content
 
 # 3. Desplegar
 agent_instance = HolaMundoAgent(model_name=GEMINI_VERSION)
-
-remote_agent = reasoning_engines.ReasoningEngine.create(
-    agent_instance,
-    requirements=[
+requirements = [
         "google-cloud-aiplatform[reasoningengine,langchain]",
         "langchain-google-vertexai",
         "langchain-community", # <--- ESENCIAL para usar ChatMessageHistory
         "cloudpickle",
         "pydantic",
-    ],
-    display_name=AGENT_DEPLOY_NAME,
+    ]
+psc_config = {
+        "network_attachment": f"projects/{PROJECT_ID}/regions/{LOCATION}/networkAttachments/{VPC_NAME}"
+}
+
+existing_agents = reasoning_engines.ReasoningEngine.list(
+    filter=f'display_name="{AGENT_DEPLOY_NAME}"'
 )
+
+if existing_agents:
+    print(f"Agente '{AGENT_DEPLOY_NAME}' encontrado. Actualizando código...")
+    remote_agent = existing_agents[0]
+    
+    # Actualizamos el agente existente con la nueva lógica o requisitos
+    remote_agent.update(
+        reasoning_engine=agent_instance,
+        requirements=requirements,
+    )
+else:
+    print(f"Agente '{AGENT_DEPLOY_NAME}' no encontrado. Creando uno nuevo...")
+    remote_agent = reasoning_engines.ReasoningEngine.create(
+        agent_instance,
+        requirements=requirements,
+        display_name=AGENT_DEPLOY_NAME
+    )
+
 
 print(f"Despliegue finalizado: {remote_agent.resource_name}")

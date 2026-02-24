@@ -1,4 +1,6 @@
 *.pyc
 .venv/
 ~*
-
+.adk
+__pycache__
+.env

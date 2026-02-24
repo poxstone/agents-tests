@@ -1,2 +1,3 @@
 google-cloud-aiplatform[reasoningengine,langchain]==1.138.0
-google-cloud-storage==3.9.0
+#google-cloud-storage==3.9.0
+google-adk==1.25.1
