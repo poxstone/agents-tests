@@ -6,7 +6,7 @@ from vertexai.preview import reasoning_engines
 # 1. Configuración (Usa los datos de tu despliegue)
 PROJECT_ID = "bluetab-colombia-data-qa"
 LOCATION = "us-central1"
-AGENT_DISPLAY_NAME = "agente-test-01" # El nombre que usaste al desplegar
+AGENT_DISPLAY_NAME = "agente_cortes" # El nombre que usaste al desplegar
 
 def main():
 
