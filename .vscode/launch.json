@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ADK client",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/vertex-agent-adk/client/client.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Langchain client",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/vertex-agent-langchain/client/client.py",
+            "console": "integratedTerminal",
+            "args": ["--session=usuario_1", "mi nombre es pedro y tengo 52 años soy de"]
+        }
+    ]
+}

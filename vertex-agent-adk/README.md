@@ -19,7 +19,7 @@ GOOGLE_CLOUD_LOCATION=us-central1
 MODEL=gemini-2.5-flash
 EOF
 
-cp .env agente_cortes/.env
+cp .env agente_cortes/.env;
 ```
 
 ## Run Local

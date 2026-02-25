@@ -7,8 +7,8 @@ from vertexai.preview import reasoning_engines
 PROJECT_ID = "bluetab-colombia-data-qa"
 PROJECT_NUMBER = "886084989545"
 LOCATION = "us-central1"
-RESOURCE_ID = "6793340288795410432"
-RESOURCE_NAME = f"projects/{PROJECT_NUMBER}/locations/{LOCATION}/reasoningEngines/{RESOURCE_ID}"
+AGENT_ID = "2537438640930291712"
+RESOURCE_NAME = f"projects/{PROJECT_NUMBER}/locations/{LOCATION}/reasoningEngines/{AGENT_ID}"
 
 
 def main():
