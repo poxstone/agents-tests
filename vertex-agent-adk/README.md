@@ -38,3 +38,12 @@ adk web;
 ```bash
 adk deploy agent_engine agente_cortes;
 ```
+
+## Consume
+
+- Update constantnts into main.py
+
+```bash
+python ./client/client.py --session="usuario_1" "mi nombre es pedro y tengo 52 años soy de colombia";
+python ./client/client.py --session="usuario_1" "hola como estas? me recuerdas?";
+```
