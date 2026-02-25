@@ -33,11 +33,16 @@ def main():
             print("Asegúrate de haber desplegado el agente desde 'vertex-agent-langchain/agent_test/agent.py'.")
             sys.exit(1)
         
-        remote_agent = existing_agents[0]
+        remote_agent_metadata = existing_agents[0]
+
+        remote_agent_resource_name = remote_agent_metadata.resource_name
+        
+        # Instantiate the ReasoningEngine client with its resource_name
+        remote_agent_client = reasoning_engines.ReasoningEngine(remote_agent_resource_name)
         
         # 4. Consultar el agente usando el método query() del ReasoningEngine.
         # El input debe ser un diccionario que mapea a los argumentos del método query del agente.
-        response = remote_agent.query(
+        response = remote_agent_client.query(
             input={"input": prompt_text, "session_id": args.session}
         )
 
