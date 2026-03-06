@@ -22,16 +22,27 @@ source .venv/bin/activate
 ## Env file
 
 ```bash
+# Extract project information from gcloud
+export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
+export GOOGLE_CLOUD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
+
+# Create .env file
 cat << EOF > .env
 GOOGLE_GENAI_USE_VERTEXAI=TRUE
-GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
+GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT
+PROJECT_NUMBER=$GOOGLE_CLOUD_PROJECT_NUMBER
 GOOGLE_CLOUD_LOCATION=us-central1
 GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY=TRUE
 OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=TRUE
 MODEL=gemini-2.5-flash
+
+# Client configuration
+AGENT_ID=5741675009013710848
 EOF
 
+# Copy .env to required directories
 cp .env agente_cortes/.env
+cp .env client/.env
 ```
 
 ## Run Local

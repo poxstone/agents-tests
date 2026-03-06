@@ -1,15 +1,35 @@
 import vertexai
 from vertexai import agent_engines
 import argparse
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde .env
+# Buscar .env en vertex-agent-adk/client/.env
+env_path = Path(__file__).resolve().parent / ".env"
+if env_path.exists():
+    load_dotenv(dotenv_path=env_path)
+    print(f"✓ Loaded .env from: {env_path}")
+else:
+    print(f"⚠ Warning: .env file not found at {env_path}")
+    load_dotenv()  # Intenta cargar desde el directorio actual o variables del sistema
 
 # 1. Configuración inicial
-PROJECT_ID = "bluetab-colombia-data-qa"
-PROJECT_NUMBER = "886084989545"
-LOCATION = "us-central1"
-AGENT_ID = "2537438640930291712"
-RESOURCE_NAME = f"projects/{PROJECT_NUMBER}/locations/{LOCATION}/reasoningEngines/{AGENT_ID}"
+GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT")
+PROJECT_NUMBER = os.getenv("PROJECT_NUMBER")
+GOOGLE_CLOUD_LOCATION = os.getenv("GOOGLE_CLOUD_LOCATION")
+AGENT_ID = os.getenv("AGENT_ID")
+RESOURCE_NAME = f"projects/{PROJECT_NUMBER}/locations/{GOOGLE_CLOUD_LOCATION}/reasoningEngines/{AGENT_ID}"
 
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+# Debug: Mostrar variables cargadas
+print(f"PROJECT: {GOOGLE_CLOUD_PROJECT}")
+print(f"PROJECT_NUMBER: {PROJECT_NUMBER}")
+print(f"LOCATION: {GOOGLE_CLOUD_LOCATION}")
+print(f"AGENT_ID: {AGENT_ID}")
+print()
+
+vertexai.init(project=GOOGLE_CLOUD_PROJECT, location=GOOGLE_CLOUD_LOCATION)
 
 def query_adk_agent(prompt, session_id):
         
