@@ -4,3 +4,4 @@
 .adk
 __pycache__
 .env
+tmp_*.py

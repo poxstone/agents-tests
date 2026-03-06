@@ -59,6 +59,50 @@ uv run adk web
 
 ## Deploy
 
+Para configurar una cuenta de servicio específica durante el despliegue a Vertex AI Agent Engine, debes editar el archivo `.agent_engine_config.json` dentro del directorio del agente (por ejemplo, `agente_cortes/.agent_engine_config.json`) y agregar el campo `service_account`:
+
+```json
+{
+  "service_account": "tu-cuenta-de-servicio@tu-proyecto.iam.gserviceaccount.com"
+}
+```
+
+### Configurar Acceso a VPC (Private Service Connect)
+
+Para permitir que el agente se conecte a una red VPC privada (por ejemplo, para consultar bases de datos internas), Vertex AI Agent Engine utiliza Private Service Connect (PSC). Debes realizar la siguiente configuración en GCP:
+
+1. **Crear una subred (si no existe)**:
+   ```bash
+   gcloud compute networks subnets create psc-agent-engine-subnet \
+       --network=default \
+       --region=us-central1 \
+       --range=10.10.0.0/28 \
+       --project=tu-proyecto
+   ```
+
+2. **Crear un Adjunto de Red (Network Attachment)** asociado a la subred creada:
+   ```bash
+   gcloud compute network-attachments create agent-engine-net-attach \
+       --region=us-central1 \
+       --subnets=psc-agent-engine-subnet \
+       --connection-preference=ACCEPT_AUTOMATIC \
+       --project=tu-proyecto
+   ```
+
+3. **Asignar Permisos**: Es **indispensable** asegurar que la cuenta de servicio predeterminada de AI Platform (`service-[PROJECT_NUM]@gcp-sa-aiplatform.iam.gserviceaccount.com`) tenga el permiso `compute.networkAttachments.update` sobre el Network Attachment para que pueda conectarse adecuadamente.
+
+4. **Actualizar la configuración del Agente**: Añadir la configuración del Network Attachment en `.agent_engine_config.json` bajo la propiedad `psc_interface_config`:
+   ```json
+   {
+     "service_account": "tu-cuenta-de-servicio@tu-proyecto.iam.gserviceaccount.com",
+     "psc_interface_config": {
+       "network_attachment": "projects/tu-proyecto/regions/us-central1/networkAttachments/agent-engine-net-attach"
+     }
+   }
+   ```
+
+Luego puedes hacer el despliegue:
+
 ```bash
 uv run adk deploy agent_engine "agente_cortes"
 ```

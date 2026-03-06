@@ -1,0 +1,6 @@
+{
+  "service_account": "sa-xxx-adk@proyecto-auto-chat-dev.iam.gserviceaccount.com",
+  "psc_interface_config": {
+    "network_attachment": "projects/proyecto-auto-chat-dev/regions/us-central1/networkAttachments/agent-engine-net-attach"
+  }
+}
