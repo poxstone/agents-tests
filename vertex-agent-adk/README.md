@@ -3,10 +3,20 @@
 
 ## Prepare environment
 
+### Install uv (if not installed)
+
 ```bash
-# install globally
-export PATH=$PATH:"/home/${USER}/.local/bin";
-python3 -m pip install -r ./requirements.txt;
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Setup project
+
+```bash
+# Install dependencies with uv
+uv sync
+
+# Activate the virtual environment
+source .venv/bin/activate
 ```
 
 ## Env file
@@ -14,18 +24,21 @@ python3 -m pip install -r ./requirements.txt;
 ```bash
 cat << EOF > .env
 GOOGLE_GENAI_USE_VERTEXAI=TRUE
-GOOGLE_CLOUD_PROJECT=bluetab-colombia-data-qa
+GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY=TRUE
+OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=TRUE
 MODEL=gemini-2.5-flash
 EOF
 
-cp .env agente_cortes/.env;
+cp .env agente_cortes/.env
 ```
 
 ## Run Local
 
 ```bash
-adk web;
+# Make sure the virtual environment is activated
+uv run adk web
 ```
 
 ## Test preguntas
@@ -36,14 +49,14 @@ adk web;
 ## Deploy
 
 ```bash
-adk deploy agent_engine agente_cortes;
+uv run adk deploy agent_engine agente_cortes
 ```
 
 ## Consume
 
-- Update constantnts into main.py
+- Update constants into main.py
 
 ```bash
-python ./client/client.py --session="usuario_1" "mi nombre es pedro y tengo 52 años soy de colombia";
-python ./client/client.py --session="usuario_1" "hola como estas? me recuerdas?";
+uv run python ./client/client.py --session="usuario_1" "mi nombre es pedro y tengo 52 años soy de colombia"
+uv run python ./client/client.py --session="usuario_1" "hola como estas? me recuerdas?"
 ```
