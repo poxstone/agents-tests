@@ -49,7 +49,7 @@ uv run adk web
 ## Deploy
 
 ```bash
-uv run adk deploy agent_engine agente_cortes
+uv run adk deploy agent_engine "agente_cortes"
 ```
 
 ## Consume
