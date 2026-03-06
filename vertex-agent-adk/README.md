@@ -59,11 +59,91 @@ uv run adk web
 
 ## Deploy
 
-Para configurar una cuenta de servicio específica durante el despliegue a Vertex AI Agent Engine, debes editar el archivo `.agent_engine_config.json` dentro del directorio del agente (por ejemplo, `agente_cortes/.agent_engine_config.json`) y agregar el campo `service_account`:
+Para configurar opciones avanzadas durante el despliegue a Vertex AI Agent Engine, debes editar el archivo `.agent_engine_config.json` dentro del directorio del agente (por ejemplo, `agente_cortes/.agent_engine_config.json`). Este archivo soporta múltiples configuraciones como límites de recursos, variables de entorno, seguridad y conexión a VPC usando PSC.
+
+A continuación, un ejemplo completo con todas las opciones principales (nota: JSON no soporta comentarios nativamente, asegúrate de removerlos si copias el archivo literal, este es un prototipo ilustrativo):
 
 ```json
 {
-  "service_account": "tu-cuenta-de-servicio@tu-proyecto.iam.gserviceaccount.com"
+  // ----------------------------------------------------------------------
+  // Identidad y Permisos
+  // ----------------------------------------------------------------------
+  
+  // Cuenta de servicio que usará el agente. Ignorado si se usa agent_identity.
+  "service_account": "tu-cuenta-de-servicio@tu-proyecto.iam.gserviceaccount.com",
+  
+  // Tipo de identidad: "IDENTITY_TYPE_UNSPECIFIED", "SERVICE_ACCOUNT" o "AGENT_IDENTITY"
+  "identity_type": "SERVICE_ACCOUNT",
+
+  // ----------------------------------------------------------------------
+  // Recursos y Escalabilidad
+  // ----------------------------------------------------------------------
+  
+  // Límites de recursos por contenedor. CPU soportada: "1", "2", "4", "6", "8". 
+  // Memoria soportada: "1Gi", "2Gi"... "32Gi"... Defaults: cpu=4, memory=4Gi
+  "resource_limits": {
+    "cpu": "4",
+    "memory": "4Gi"
+  },
+  
+  // Mínimo de instancias siempre corriendo (0 a 10). Default 1.
+  "min_instances": 1,
+  
+  // Máximo de instancias (1 a 1000, o hasta 100 si usa PSC/VPC-SC). Default 100.
+  "max_instances": 100,
+  
+  // Concurrencia por contenedor (recomendado: 2 * cpu + 1). Default 9.
+  "container_concurrency": 9,
+
+  // ----------------------------------------------------------------------
+  // Variables de Entorno y Seguridad
+  // ----------------------------------------------------------------------
+  
+  // Variables de entorno estándar
+  "env": [
+    { "name": "MI_VARIABLE", "value": "mi_valor" }
+  ],
+  
+  // Variables de entorno desde Cloud Secret Manager
+  "secret_env": [
+    { "name": "API_KEY", "secret": "projects/12345/secrets/mi-secreto/versions/latest" }
+  ],
+  
+  // Especificación para llaves de encriptación manejadas por el cliente (CMEK)
+  "encryption_spec": {
+    "kms_key_name": "projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY_NAME"
+  },
+
+  // ----------------------------------------------------------------------
+  // Redes (Private Service Connect - PSC-I)
+  // ----------------------------------------------------------------------
+  
+  "psc_interface_config": {
+    // Adjunto de red (Network Attachment) para la VPC
+    "network_attachment": "projects/tu-proyecto/regions/us-central1/networkAttachments/agent-engine-net-attach",
+    
+    // Configuración opcional para resolución DNS privada a través de VPC
+    "dns_peering_configs": [
+      {
+        "domain": "mi-dominio-interno.corp.",
+        "target_project": "proyecto-red-destino",
+        "target_network": "red-vpc-destino"
+      }
+    ]
+  },
+
+  // ----------------------------------------------------------------------
+  // Otras configuraciones
+  // ----------------------------------------------------------------------
+  
+  // Paquetes o requerimientos adicionales de Python a instalar durante build
+  "requirements": [
+    "requests",
+    "google-cloud-aiplatform"
+  ],
+  
+  // "STABLE" (por defecto) o "EXPERIMENTAL" para habilitar modo preview del server
+  "agent_server_mode": "STABLE"
 }
 ```
 
