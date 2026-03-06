@@ -70,4 +70,5 @@ uv run adk deploy agent_engine "agente_cortes"
 ```bash
 uv run python ./client/client.py --session="usuario_1" "mi nombre es pedro y tengo 52 años soy de colombia"
 uv run python ./client/client.py --session="usuario_1" "hola como estas? me recuerdas?"
+uv run python ./client/client.py --session="usuario_1" "que hora es?"
 ```
