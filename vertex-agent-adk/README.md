@@ -49,7 +49,13 @@ cp .env client/.env
 
 ```bash
 # Make sure the virtual environment is activated
+gcloud auth application-default login
 uv run adk web
+
+#opcional
+docker run -it -d --rm --name redis-service -p 6379:6379 --platform linux/amd64 redis:7.2-alpine redis-server
+redis-cli -h 127.0.0.1 -p 6379
+# --requirepass MyPassXample
 ```
 
 ## Test preguntas

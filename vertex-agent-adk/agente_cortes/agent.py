@@ -4,6 +4,7 @@ import urllib.error
 from datetime import datetime
 from dotenv import load_dotenv
 from google.cloud import storage
+import redis
 
 from google.adk import Agent
 from google.adk.models import Gemini
@@ -73,6 +74,28 @@ def fetch_website_headers(protocol: str = "https", domain: str = "www.eltiempo.c
     except Exception as e:
         return f"Error inesperado al acceder a {url}: {str(e)}"
 
+def save_to_redis(key: str, value: str) -> str:
+    """
+    Guarda un valor en Redis usando el host y password de variables de entorno (por defecto host 127.0.0.1).
+    
+    Args:
+        key (str): La clave bajo la cual guardar el valor.
+        value (str): El valor a guardar.
+        
+    Returns:
+        str: Un mensaje de confirmación de éxito o el error.
+    """
+    try:
+        # Recuperar password y host de la variable de entorno
+        redis_host = os.getenv("REDIS_HOST", "10.0.0.229")
+        
+        # Se conecta a redis
+        client = redis.Redis(host=redis_host, port=6379, db=0, decode_responses=True)
+        client.set(key, value)
+        return f"Éxito: Se ha guardado el valor en la clave '{key}'."
+    except Exception as e:
+        return f"Error al guardar en Redis: {str(e)}"
+
 root_agent = Agent(
     name="agente_cortes",
     description="Asistente recuerda",
@@ -81,5 +104,5 @@ root_agent = Agent(
         retry_options=retry_options
     ),
     instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento",
-    tools=[get_current_time, list_gcs_buckets, fetch_website_headers],
+    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis],
 )
