@@ -1,6 +1,6 @@
 {
-  "service_account": "sa-gdp1018-hyc-adk@vanti-auto-chat-dev.iam.gserviceaccount.com",
+  "service_account": "sa-xxx-adk@project.iam.gserviceaccount.com",
   "psc_interface_config": {
-    "network_attachment": "projects/vanti-auto-chat-dev/regions/us-central1/networkAttachments/agent-engine-net-attach"
+    "network_attachment": "projects/project/regions/us-central1/networkAttachments/agent-engine-net-attach"
   }
 }

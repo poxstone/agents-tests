@@ -55,6 +55,10 @@ uv run adk web
 #opcional
 docker run -it -d --rm --name redis-service -p 6379:6379 --platform linux/amd64 redis:7.2-alpine redis-server
 redis-cli -h 127.0.0.1 -p 6379
+
+docker run -it -d --rm --name redis-service -p 6379:6379 -e POSTGRES_PASSWORD=MyPassXample -e POSTGRES_DB=vectordb --platform pgvector/pgvector:pg16 redis-server
+
+
 # --requirepass MyPassXample
 ```
 
