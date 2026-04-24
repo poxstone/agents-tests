@@ -211,12 +211,13 @@ uv run python ./client/client.py --session="usuario_1" "lista los buckets de mi 
 ## permisos requeridos
 
 - PROJECT_AGENT
--- sa-agent@PROJECT_AGENT.gserviceaccount.com
---- Vertex AI User
---- Service Usage Consumer
+  - sa-agent@PROJECT_AGENT.gserviceaccount.com
+    - Vertex AI User
+    - Service Usage Consumer
+  - service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
+    - Vertex AI Service Admin
+    - Compute Network Admin
 
 - PROJECT_NETWORK
--- service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
---- Vertex AI Service Admin
---- Compute Network Admin
-
+  - service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
+    - Compute Network User
