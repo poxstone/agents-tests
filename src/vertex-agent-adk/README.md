@@ -207,3 +207,16 @@ uv run python ./client/client.py --session="usuario_1" "hola como estas? me recu
 uv run python ./client/client.py --session="usuario_1" "que hora es?"
 uv run python ./client/client.py --session="usuario_1" "lista los buckets de mi proyecto"
 ```
+
+## permisos requeridos
+
+- PROJECT_AGENT
+-- sa-agent@PROJECT_AGENT.gserviceaccount.com
+--- Vertex AI User
+--- Service Usage Consumer
+
+- PROJECT_NETWORK
+-- service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
+--- Vertex AI Service Admin
+--- Compute Network Admin
+
