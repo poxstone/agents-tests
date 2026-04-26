@@ -1,6 +1,8 @@
 import os
+import time
 import urllib.request
 import urllib.error
+import urllib.parse
 from datetime import datetime
 from dotenv import load_dotenv
 from google.cloud import storage
@@ -40,7 +42,7 @@ def list_gcs_buckets(project_id: str = None) -> list[str]:
     except Exception as e:
         return [f"Error al listar buckets: {str(e)}"]
 
-def fetch_website_headers(protocol: str = "https", domain: str = "www.eltiempo.com", port: int = 443) -> str:
+def fetch_website_headers(protocol: str = "https", domain: str = "www.eltiempo.com", port: int = 443, path: str = "/", params: dict = None, method: str = "GET") -> str:
     """
     Realiza una petición a un sitio web y devuelve sus encabezados HTTP (Headers).
     
@@ -48,19 +50,35 @@ def fetch_website_headers(protocol: str = "https", domain: str = "www.eltiempo.c
         protocol (str): Protocolo a usar (http o https). Por defecto https.
         domain (str): El dominio del sitio web. Por defecto www.eltiempo.com.
         port (int): El puerto a consultar. Por defecto 443.
+        path (str): El path o ruta de la URL. Por defecto /.
+        params (dict): Parámetros de consulta (query parameters) o datos del cuerpo a incluir en la petición. Por defecto None.
+        method (str): El método HTTP a utilizar (GET, POST, PUT, etc.). Por defecto GET.
         
     Returns:
         str: Los encabezados de la respuesta HTTP en formato texto y una parte del body, o un mensaje de error si falla.
     """
+    # Aseguramos que el path empiece con /
+    if not path.startswith('/'):
+        path = '/' + path
+
     # Construcción de la URL
     if (protocol == "https" and port == 443) or (protocol == "http" and port == 80):
-        url = f"{protocol}://{domain}"
+        url = f"{protocol}://{domain}{path}"
     else:
-        url = f"{protocol}://{domain}:{port}"
+        url = f"{protocol}://{domain}:{port}{path}"
+        
+    # Manejo de parámetros
+    data = None
+    if params:
+        encoded_params = urllib.parse.urlencode(params)
+        if method.upper() in ["POST", "PUT", "PATCH"]:
+            data = encoded_params.encode('utf-8')
+        else:
+            url = f"{url}?{encoded_params}"
         
     try:
         # Se envía un User-Agent de navegador para evitar bloqueos básicos
-        req = urllib.request.Request(url, method="GET", headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
+        req = urllib.request.Request(url, data=data, method=method.upper(), headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'})
         with urllib.request.urlopen(req, timeout=10) as response:
             headers = str(response.headers)
             try:
@@ -96,6 +114,22 @@ def save_to_redis(key: str, value: str) -> str:
     except Exception as e:
         return f"Error al guardar en Redis: {str(e)}"
 
+def wait_for_seconds(seconds: int) -> str:
+    """
+    Pausa la ejecución (espera) durante el número especificado de segundos.
+    
+    Args:
+        seconds (int): La cantidad de segundos a esperar.
+        
+    Returns:
+        str: Un mensaje indicando que el tiempo de espera ha concluido.
+    """
+    try:
+        time.sleep(seconds)
+        return f"Éxito: Se ha esperado durante {seconds} segundos."
+    except Exception as e:
+        return f"Error durante la espera: {str(e)}"
+
 root_agent = Agent(
     name="agente_cortes",
     description="Asistente recuerda",
@@ -104,5 +138,5 @@ root_agent = Agent(
         retry_options=retry_options
     ),
     instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento",
-    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis],
+    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis, wait_for_seconds],
 )
