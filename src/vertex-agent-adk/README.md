@@ -19,12 +19,19 @@ uv sync
 source .venv/bin/activate
 ```
 
+
 ## Env file
 
 ```bash
 # Extract project information from gcloud
 export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 export GOOGLE_CLOUD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
+
+# login
+# gcloud auth application-default login
+gcloud auth application-default login --impersonate-service-account sa-agent-01@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
+# best
+export GOOGLE_APPLICATION_CREDENTIALS="${PWD}/../../credentials.json"
 
 # Create .env file
 cat << EOF > .env

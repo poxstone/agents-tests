@@ -1,5 +1,7 @@
 import os
 import time
+import socket
+import subprocess
 import urllib.request
 import urllib.error
 import urllib.parse
@@ -130,6 +132,38 @@ def wait_for_seconds(seconds: int) -> str:
     except Exception as e:
         return f"Error durante la espera: {str(e)}"
 
+def resolve_dns_info(domain: str) -> str:
+    """
+    Resuelve la dirección IP de un dominio y obtiene los servidores DNS (registros NS) a los que pertenece.
+    
+    Args:
+        domain (str): El nombre de dominio DNS a resolver.
+        
+    Returns:
+        str: Un mensaje con la IP y los servidores DNS, o un mensaje de error.
+    """
+    try:
+        ip_address = socket.gethostbyname(domain)
+        
+        # Intentamos obtener los servidores DNS (NS) usando el comando dig
+        try:
+            ns_output = subprocess.check_output(
+                ["dig", "+short", "NS", domain], 
+                stderr=subprocess.STDOUT, 
+                text=True
+            ).strip()
+            
+            if not ns_output:
+                ns_servers = "No se encontraron servidores DNS."
+            else:
+                ns_servers = ns_output
+        except Exception as e:
+            ns_servers = f"No se pudo obtener los servidores DNS: {str(e)}"
+            
+        return f"Dominio: {domain}\nIP: {ip_address}\nServidores DNS:\n{ns_servers}"
+    except Exception as e:
+        return f"Error al resolver el DNS para {domain}: {str(e)}"
+
 root_agent = Agent(
     name="agente_cortes",
     description="Asistente recuerda",
@@ -138,5 +172,5 @@ root_agent = Agent(
         retry_options=retry_options
     ),
     instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento",
-    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis, wait_for_seconds],
+    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis, wait_for_seconds, resolve_dns_info],
 )
