@@ -32,6 +32,7 @@ export GOOGLE_CLOUD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJ
 gcloud auth application-default login --impersonate-service-account sa-agent-01@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
 # best
 export GOOGLE_APPLICATION_CREDENTIALS="${PWD}/../../credentials.json"
+gcloud auth login --cred-file="${PWD}/../../credentials.json"
 
 # Create .env file
 cat << EOF > .env
@@ -222,9 +223,10 @@ uv run python ./client/client.py --session="usuario_1" "lista los buckets de mi 
     - Vertex AI User
     - Service Usage Consumer
   - service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
-    - Vertex AI Service Admin
-    - Compute Network Admin
+    - Vertex AI Service Agent
 
 - PROJECT_NETWORK
-  - service-PROJECT_AGENT_NUMBER@gcp-sa-aiplatform.iam.gserviceaccount.com
-    - Compute Network User
+  - service-PROJECT_NETWORK@gcp-sa-aiplatform.iam.gserviceaccount.com
+    - enable agent platform engine
+    - deploy one agent to enable S.A 
+    - Compute Network Admin
