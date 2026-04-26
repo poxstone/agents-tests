@@ -1,6 +1,6 @@
 {
-  "service_account": "sa-xxx-adk@project.iam.gserviceaccount.com",
+  "service_account": "sa-agent-01@osman-once-ia.iam.gserviceaccount.com",
   "psc_interface_config": {
-    "network_attachment": "projects/project/regions/us-central1/networkAttachments/agent-engine-net-attach"
+    "network_attachment": "projects/osman-once-net/regions/us-central1/networkAttachments/psc-01"
   }
 }
