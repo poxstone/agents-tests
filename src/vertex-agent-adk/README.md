@@ -24,6 +24,7 @@ source .venv/bin/activate
 
 ```bash
 # Extract project information from gcloud
+gcloud config set project "osman-once-ia"
 export GOOGLE_CLOUD_PROJECT=$(gcloud config get-value project)
 export GOOGLE_CLOUD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJECT --format="value(projectNumber)")
 
@@ -32,7 +33,7 @@ export GOOGLE_CLOUD_PROJECT_NUMBER=$(gcloud projects describe $GOOGLE_CLOUD_PROJ
 gcloud auth application-default login --impersonate-service-account sa-agent-01@${GOOGLE_CLOUD_PROJECT}.iam.gserviceaccount.com
 # best
 export GOOGLE_APPLICATION_CREDENTIALS="${PWD}/../../credentials.json"
-gcloud auth login --cred-file="${PWD}/../../credentials.json"
+gcloud auth login --cred-file="${GOOGLE_APPLICATION_CREDENTIALS}"
 
 # Create .env file
 cat << EOF > .env

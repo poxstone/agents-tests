@@ -12,6 +12,8 @@ import redis
 
 from google.adk import Agent
 from google.adk.models import Gemini
+from google.adk.tools.mcp_tool import McpToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import SseConnectionParams
 from google.genai import types
 
 retry_options = types.HttpRetryOptions(initial_delay=1, attempts=6)
@@ -126,6 +128,8 @@ def wait_for_seconds(seconds: int) -> str:
     Returns:
         str: Un mensaje indicando que el tiempo de espera ha concluido.
     """
+    if seconds > 60:
+        return "Error: el tiempo máximo de espera es 60 segundos."
     try:
         time.sleep(seconds)
         return f"Éxito: Se ha esperado durante {seconds} segundos."
@@ -171,6 +175,18 @@ root_agent = Agent(
         model=os.getenv("MODEL", "gemini-2.5-flash"),
         retry_options=retry_options
     ),
-    instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento",
-    tools=[get_current_time, list_gcs_buckets, fetch_website_headers, save_to_redis, wait_for_seconds, resolve_dns_info],
+    instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento, si te piden sumar o multiplicar algo utiliza el MCP toolset",
+    tools=[
+        get_current_time, 
+        list_gcs_buckets, 
+        fetch_website_headers, 
+        save_to_redis, 
+        wait_for_seconds, 
+        resolve_dns_info,
+        McpToolset(
+            connection_params=SseConnectionParams(
+                url="https://mcp-simple-server-ecf6di2mlq-uc.a.run.app/sse"
+            )
+        )
+    ],
 )
