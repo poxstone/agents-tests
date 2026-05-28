@@ -175,7 +175,8 @@ root_agent = Agent(
         model=os.getenv("MODEL", "gemini-2.5-flash"),
         retry_options=retry_options
     ),
-    instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento, si te piden sumar o multiplicar algo utiliza el MCP toolset",
+    instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado.",
+    #instruction="Eres un asistente con memoria persistente, si te dan datos personales siempre respondes dirigiendote formalmente con su nombre y algo que te haya contado. siempre estas atento, si te piden sumar o multiplicar algo utiliza el MCP toolset",
     tools=[
         get_current_time, 
         list_gcs_buckets, 
@@ -183,10 +184,10 @@ root_agent = Agent(
         save_to_redis, 
         wait_for_seconds, 
         resolve_dns_info,
-        McpToolset(
-            connection_params=SseConnectionParams(
-                url="https://mcp-simple-server-ecf6di2mlq-uc.a.run.app/sse"
-            )
-        )
+        #McpToolset(
+        #    connection_params=SseConnectionParams(
+        #        url="https://mcp-simple-server-ecf6di2mlq-uc.a.run.app/sse"
+        #    )
+        #)
     ],
 )

@@ -231,3 +231,47 @@ uv run python ./client/client.py --session="usuario_1" "lista los buckets de mi 
     - enable agent platform engine
     - deploy one agent to enable S.A 
     - Compute Network Admin
+
+
+## TEST agente_cortes server.py
+
+```bash
+# require variables de entorno
+export GOOGLE_APPLICATION_CREDENTIALS=../credentials.json
+export GOOGLE_CLOUD_PROJECT=gcp-project-dev
+
+uv run python server.py;
+```
+### CURLS server.py
+```bash
+user="usuario_005";
+session="sesion_005";
+
+# curl -X GET http://localhost:9000/list-apps
+# ["agente_cortes","client"]
+
+#1. Crear la sesión (guarda el session_id que devuelve)
+curl -X POST "http://localhost:9000/apps/agente_cortes/users/${user}/sessions/${session}" \
+  -H "Content-Type: application/json" \
+  -d '{}';
+#-d '{"id": "sesion_abc"}'
+
+#2. Enviar mensaje al agente
+read -r -d '' body <<EOF
+{
+    "appName":"agente_cortes",
+    "userId":"${user}",
+    "sessionId":"${session}",
+    "newMessage":{
+        "role":"user",
+        "parts":[
+            {"text":"Hola, ¿qué puedes hacer por mí?"}
+            ]
+        }
+}
+EOF
+
+curl -X POST http://localhost:9000/run \
+  -H "Content-Type: application/json" \
+  -d "${body}";
+```
